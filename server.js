@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 
 // Configuration
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 const API_SERVICE_URL = process.env.API_SERVICE_URL;
 
 // Logging
