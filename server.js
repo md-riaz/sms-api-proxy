@@ -82,7 +82,10 @@ app.use(
         /* handle proxyRes */
       },
       error: (err, req, res) => {
-        /* handle error */
+        res.json({
+          error: 500,
+          msg: "Something went wrong on the proxy server.",
+        });
       },
     },
   })
