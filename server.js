@@ -1,7 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const { createProxyMiddleware } = require("http-proxy-middleware");
-const cors = require('cors');
+const cors = require("cors");
 require("dotenv").config();
 
 // Create Express Server
@@ -37,6 +37,10 @@ app.use(
       proxyReq.setHeader(
         "x-forwarded-for",
         req.headers["x-forwarded-for"].split(",")[0]
+      );
+      proxyReq.setHeader(
+        "origin",
+        req.headers["origin"] ?? "//" + process.env.APP_ORIGIN
       );
       if (req.method === "POST") {
         // Make any needed POST parameter changes
