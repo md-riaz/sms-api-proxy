@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const url = require("url");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const cors = require("cors");
 require("dotenv").config();
@@ -48,38 +49,34 @@ app.use(
       );
       if (req.method === "POST") {
         // Make any needed POST parameter changes
-        let body = new Object();
+        let postBody = req.body;
 
         if (req.path === "/user/login/") {
-          let postBody = req.body;
           const ip = req.ip.replace("::ffff:", "") ?? "127.0.0.1";
-          body.client_ip = ip;
-          body["api_key"] = process.env.APP_KEY;
-          body.origin = process.env.APP_ORIGIN;
-
-          body = { ...body, ...postBody };
+          postBody.client_ip = ip;
+          postBody["api_key"] = process.env.APP_KEY;
+          postBody.origin = req.headers["origin"]
+            ? url.parse(req.headers["origin"], true).hostname
+            : process.env.APP_ORIGIN;
         }
 
         // URI encode JSON object
-        body = Object.keys(body)
+        postBody = Object.keys(postBody)
           .map(function (key) {
             return (
-              encodeURIComponent(key) + "=" + encodeURIComponent(body[key])
+              encodeURIComponent(key) + "=" + encodeURIComponent(postBody[key])
             );
           })
           .join("&");
 
         // Update header
         proxyReq.setHeader("content-type", "application/x-www-form-urlencoded");
-        proxyReq.setHeader("content-length", body.length);
+        proxyReq.setHeader("content-length", postBody.length);
 
         // Write out body changes to the proxyReq stream
-        proxyReq.write(body);
+        proxyReq.write(postBody);
         proxyReq.end();
       }
-    },
-    proxyRes: (proxyRes, req, res) => {
-      /* handle proxyRes */
     },
     error: (err, req, res) => {
       res.json({
