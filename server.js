@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // Configuration
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 const API_SERVICE_URL = process.env.API_SERVICE_URL;
 
 // Info GET endpoint
@@ -38,6 +38,7 @@ app.use(
   createProxyMiddleware({
     target: API_SERVICE_URL,
     changeOrigin: true,
+    secure: false,
     onProxyReq: function onProxyReq(proxyReq, req, res) {
       proxyReq.setHeader(
         "x-forwarded-for",
