@@ -52,6 +52,7 @@ app.use(
         // Make any needed POST parameter changes
         let postBody = req.body;
 
+        // user login conditions
         if (req.path === "/user/login/") {
           const ip = req.ip.replace("::ffff:", "") ?? "127.0.0.1";
           postBody.client_ip = ip;
@@ -59,6 +60,11 @@ app.use(
           postBody.origin = req.headers["origin"]
             ? url.parse(req.headers["origin"], true).hostname
             : process.env.APP_ORIGIN;
+        }
+        
+        // user recharge conditions
+        if (req.path === "/recharge/package/"){
+          postBody["api_key"] = process.env.APP_KEY;
         }
 
         // URI encode JSON object
